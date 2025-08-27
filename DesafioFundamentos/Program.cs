@@ -3,44 +3,61 @@
 // Coloca o encoding para UTF8 para exibir acentuação
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-decimal precoInicial = 0;
-decimal precoPorHora = 0;
+// DEC-09 — Comportamento seguro de Clear / ReadKey com I/O redirecionado
+LimparTerminal();
 
-Console.WriteLine("Seja bem vindo ao sistema de estacionamento!\n" +
-                  "Digite o preço inicial:");
-precoInicial = Convert.ToDecimal(Console.ReadLine());
+// DEC-07 — Uso de Raw String Literals para menus
+Console.WriteLine($"""
+==================================================
+  Seja bem - vindo ao sistema de estacionamento!
+================================================== 
 
-Console.WriteLine("Agora digite o preço por hora:");
-precoPorHora = Convert.ToDecimal(Console.ReadLine());
+""");
 
-// Instancia a classe Estacionamento, já com os valores obtidos anteriormente
-Estacionamento es = new Estacionamento(precoInicial, precoPorHora);
+Console.Write("Por favor, digite o preço inicial do seu estacionamento: R$ ");
 
-string opcao = string.Empty;
+// Criando e preenchendo as variáveis
+// DEC-06 — Tratamento de input inválido
+decimal precoInicial = Convert.ToDecimal(Console.ReadLine());
+
+Console.Write("Agora digite o preço por hora do seu estacionamento: R$ ");
+decimal precoPorHora = Convert.ToDecimal(Console.ReadLine());
+
+// Instanciando a classe Estacionamento com tipo explícito sem usar var para melhor legibilidade
+Estacionamento estacionamento = new Estacionamento(precoInicial, precoPorHora);
+
+// string opcao = string.Empty; Essa variável não é necessária já que estamos lidando com swith case
 bool exibirMenu = true;
 
 // Realiza o loop do menu
 while (exibirMenu)
 {
-    Console.Clear();
-    Console.WriteLine("Digite a sua opção:");
-    Console.WriteLine("1 - Cadastrar veículo");
-    Console.WriteLine("2 - Remover veículo");
-    Console.WriteLine("3 - Listar veículos");
-    Console.WriteLine("4 - Encerrar");
+    LimparTerminal();
+    Console.WriteLine("""
+    ==================================================
+                    MENU PRINCIPAL
+    --------------------------------------------------
+    1 - Cadastrar veículo
+    2 - Remover veículo
+    3 - Listar veículos
+    4 - Encerrar
+    ==================================================
+
+    """); 
+    Console.Write("Digite a sua opção: ");
 
     switch (Console.ReadLine())
     {
         case "1":
-            es.AdicionarVeiculo();
+            estacionamento.AdicionarVeiculo();
             break;
 
         case "2":
-            es.RemoverVeiculo();
+            estacionamento.RemoverVeiculo();
             break;
 
         case "3":
-            es.ListarVeiculos();
+            estacionamento.ListarVeiculos();
             break;
 
         case "4":
@@ -48,12 +65,37 @@ while (exibirMenu)
             break;
 
         default:
-            Console.WriteLine("Opção inválida");
+            Console.WriteLine("\nOpção inválida! Tente novamente.");
             break;
     }
 
-    Console.WriteLine("Pressione uma tecla para continuar");
-    Console.ReadLine();
+    Console.WriteLine("\nPressione qualquer tecla para continuar...");
+    // DEC-09 — Comportamento seguro de Clear / ReadKey com I/O redirecionado
+    if (!Console.IsInputRedirected)
+    {
+        Console.ReadKey();
+    }
+    else
+    {
+        // Se estiver no modo debug (ou com entrada redirecionada), 
+        // espera por um Enter para evitar o erro.
+        Console.ReadLine();
+    }
 }
 
-Console.WriteLine("O programa se encerrou");
+LimparTerminal();
+Console.WriteLine("""
+==================================================
+        Obrigado por utilizar o sistema!
+==================================================
+""");
+
+static void LimparTerminal()
+{
+    // DEC-09 — Comportamento seguro de Clear / ReadKey com I/O redirecionado
+    if (!Console.IsOutputRedirected)
+    {
+        Console.Clear();
+    }
+    // Se for redirecionada, o método simplesmente não faz nada
+}
