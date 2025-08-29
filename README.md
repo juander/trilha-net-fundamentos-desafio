@@ -62,7 +62,7 @@ classDiagram
 ## Requisitos
 
 - **.NET SDK 8.0** (migrado do .NET 6.0 original para aproveitar recursos modernos como **Construtores Primários** e **Raw String Literals**).  
-  - A versão usada pode ser especificada em `global.json` (opcional).
+- A versão usada pode ser modificada no arquivo "DesafioFundamentos.csproj" (opcional).
 
 ## Como executar 
 
